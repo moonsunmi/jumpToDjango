@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponseNotAllowed
 from django.utils import timezone
 
 from .models import Question
-from .forms import QuestionForm
+from .forms import QuestionForm, AnswerForm
 
 # Create your views here.
 
@@ -21,8 +22,19 @@ def detail(request, question_id):
 
 def answer_create(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    question.answer_set.create(content=request.POST.get('content'), create_date=timezone.now())
-    return redirect('pybo:detail', question_id=question.id)
+
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.create_date = timezone.now()
+            answer.question = question
+            answer.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        return HttpResponseNotAllowed('only POST is allowed')
+    context = { 'question': question, 'form': form }
+    return render(request, 'pybo/question_detail.html', context)
 
 
 def question_create(request):
@@ -35,8 +47,8 @@ def question_create(request):
             question.create_date = timezone.now()
             question.save()
             return redirect('pybo:index')
-    else:  # '질문 목록' 화면에서 [질문 등록하기] 버튼을 누른 경우
+    else:  # '질문 목록' 화면에서 직접 접속한 경우
         form = QuestionForm()
-    context = {'form':form}
+    context = {'form': form}
     return render(request, 'pybo/question_form.html', context)
 
