@@ -1,4 +1,5 @@
 mysite/db.sqlite3
-mysite/.idea
+mystie/.idea
 .gitattributes
 .DS_Store
+.idea
