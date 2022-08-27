@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseNotAllowed
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .models import Question
@@ -61,10 +62,10 @@ def question_create(request):
 
 
 @login_required(login_url='common:login')
-def question_modify(request):
+def question_modify(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if request.user != question.user:
-        message.error(request, '수정권한이 없습니다.')
+    if request.user != question.author:
+        messages.error(request, '수정권한이 없습니다.')
         return redirect('pybo:detail', question_id=question.id)
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
@@ -72,7 +73,7 @@ def question_modify(request):
             question = form.save(commit=False)
             question.modify_date = timezone.now()
             question.save()
-            return redirect('pybo:detail', question_id=question_id)
+            return redirect('pybo:detail', question_id=question.id)
     else:
         form = QuestionForm(instance=question)
     context = {'form': form}
