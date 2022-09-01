@@ -6,10 +6,9 @@ from .models import Answer
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['subject', 'author', 'content']
+        fields = ['subject', 'content']
         labels = {
             'subject': '제목',
-            'author': '작성자',
             'content': '내용',
         }
 

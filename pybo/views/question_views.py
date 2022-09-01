@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from ..forms import QuestionForm, AnswerForm
-from ..models import Question, Answer
+from ..forms import QuestionForm
+from ..models import Question
 
 
 @login_required(login_url='common:login')
